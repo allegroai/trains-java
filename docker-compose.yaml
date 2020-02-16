@@ -1,0 +1,81 @@
+version: "3.4"
+
+services:
+  app:
+    build:
+      context: .
+
+  ############
+  #  Trains  #
+  ############
+  trains-server:
+    image: allegroai/trains:0.12.1
+    ports:
+    - 8008:8008
+    - 8080:80
+    - 8081:8081
+    entrypoint: /bin/bash
+    command:
+     - -c
+     - "echo \"#!/bin/bash\" > /opt/trains/all.sh && echo \"/opt/trains/wrapper.sh webserver&\" >> /opt/trains/all.sh && echo \"/opt/trains/wrapper.sh fileserver&\" >> /opt/trains/all.sh && echo \"/opt/trains/wrapper.sh apiserver\" >> /opt/trains/all.sh && cat /opt/trains/all.sh && chmod +x /opt/trains/all.sh && /opt/trains/all.sh"
+    volumes:
+    - ./tmp/trains/logs:/var/log/trains
+    - ./tmp/trains/data/fileserver:/mnt/fileserver
+    environment:
+      ELASTIC_SERVICE_HOST: trains-elastic
+      MONGODB_SERVICE_HOST: trains-mongo
+      REDIS_SERVICE_HOST: trains-redis
+      TRAINS_ELASTIC_SERVICE_HOST: trains-elastic
+      TRAINS_ELASTIC_SERVICE_PORT: 9200
+      TRAINS_MONGODB_SERVICE_HOST: trains-mongo
+      TRAINS_MONGODB_SERVICE_PORT: 27017
+      TRAINS_REDIS_SERVICE_HOST: trains-redis
+      TRAINS_REDIS_SERVICE_PORT: 6379
+    depends_on:
+      - trains-redis
+      - trains-mongo
+      - trains-elastic
+  trains-elastic:
+    image: docker.elastic.co/elasticsearch/elasticsearch:5.6.16
+    ports:
+    - "9200:9200"
+    volumes:
+    - ./tmp/trains/data/elastic:/usr/share/elasticsearch/data
+    environment:
+      ES_JAVA_OPTS: -Xms2g -Xmx2g
+      bootstrap.memory_lock: "true"
+      cluster.name: trains
+      cluster.routing.allocation.node_initial_primaries_recoveries: "500"
+      discovery.zen.minimum_master_nodes: "1"
+      http.compression_level: "7"
+      node.ingest: "true"
+      node.name: trains
+      reindex.remote.whitelist: '*.*'
+      script.inline: "true"
+      script.painless.regex.enabled: "true"
+      script.update: "true"
+      thread_pool.bulk.queue_size: "2000"
+      thread_pool.search.queue_size: "10000"
+      xpack.monitoring.enabled: "false"
+      xpack.security.enabled: "false"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+  trains-mongo:
+    image: mongo:3.6.5
+    ports:
+    - "27017:27017"
+    command: --setParameter internalQueryExecMaxBlockingSortBytes=196100200
+    volumes:
+    - ./tmp/trains/data/mongo/db:/data/db
+    - ./tmp/trains/data/mongo/configdb:/data/configdb
+  trains-redis:
+    image: redis:5.0
+    ports:
+    - "6379:6379"
+    volumes:
+    - ./tmp/trains/data/redis:/data

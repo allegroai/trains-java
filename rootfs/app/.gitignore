@@ -1,3 +1,8 @@
+
+# Created by https://www.gitignore.io/api/macos,vim,linux,windows,sbt,scala,java
+# Edit at https://www.gitignore.io/?templates=macos,vim,linux,windows,sbt,scala,java
+
+### Java ###
 # Compiled class file
 *.class
 
@@ -21,9 +26,6 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
-
-# Created by https://www.gitignore.io/api/macos,vim,linux,windows
-# Edit at https://www.gitignore.io/?templates=macos,vim,linux,windows
 
 ### Linux ###
 *~
@@ -68,6 +70,22 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+### SBT ###
+# Simple Build Tool
+# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
+
+dist/*
+target/
+lib_managed/
+src_managed/
+project/boot/
+project/plugins/project/
+.history
+.cache
+.lib/
+
+### Scala ###
+
 ### Vim ###
 # Swap
 [._]*.s[a-v][a-z]
@@ -82,15 +100,10 @@ Sessionx.vim
 
 # Temporary
 .netrwhist
-
 # Auto-generated tag files
 tags
-
 # Persistent undo
 [._]*.un~
-
-# Coc configuration directory
-.vim
 
 ### Windows ###
 # Windows thumbnail cache files
@@ -118,4 +131,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.gitignore.io/api/macos,vim,linux,windows
+# End of https://www.gitignore.io/api/macos,vim,linux,windows,sbt,scala,java

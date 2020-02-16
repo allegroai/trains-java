@@ -1,0 +1,36 @@
+version: "3.4"
+
+services:
+  app:
+    build:
+      context: .
+      target: SBT_DEV
+    volumes:
+      - ./rootfs/app:/app-dev
+      - ivy-cache:/root/.ivy2
+      - sbt-cache:/root/.sbt
+      - maven-cache:/root/.m2/repository
+    working_dir: /app-dev
+    command: cat
+    stdin_open: true
+    tty: true
+
+volumes:
+  ivy-cache:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${HOME}/.ivy2
+  sbt-cache:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${HOME}/.sbt
+  maven-cache:
+    driver: local
+    driver_opts:
+      o: bind
+      type: none
+      device: ${HOME}/.m2/repository
